@@ -12,3 +12,12 @@ createdb:
 .PHONY: dropdb
 dropdb:
 	@docker exec -it simple-bank-pgdb dropdb ${POSTGRES_DB}
+
+
+.PHONY: migrate-up
+migrate-up:
+	@migrate -path db/migration -database "postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@localhost:5432/${POSTGRES_DB}?sslmode=disable" -verbose up
+
+.PHONY: migrate-down
+migrate-down:
+	@migrate -path db/migration -database "postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@localhost:5432/${POSTGRES_DB}?sslmode=disable" -verbose down
