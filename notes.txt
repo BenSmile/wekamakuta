@@ -42,6 +42,81 @@ https://dbdiagram.io/d/Simple-Bank-671fa61697a66db9a3879343
 
 Install golang migration
 
-to use migration :
+to create migration :
 
 migrate create -ext sql -dir db/migration -seq init_schema
+
+to apply migration
+
+migrate -path db/migration -database "postgres://root:secret@localhost:5432/simple_bank?sslmode=disable" -verbose up
+
+with goose goose postgres postgres://root:secret@localhost:5432/simple_bank [up | down]
+
+install go get github.com/stretchr/testify
+
+
+-- Makefile improvement
+
+# Load environment variables from .env file if it exists
+ifneq (,$(wildcard ./.env))
+    include .env
+    export $(shell sed 's/=.*//' .env)
+endif
+
+# Database connection URL
+POSTGRES_CONNECTION_URL=postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@localhost:5432/${POSTGRES_DB}?sslmode=disable
+
+.PHONY: postgres
+postgres:
+	@echo "Starting PostgreSQL container..."
+	@docker run --name simple-bank-pgdb -p "5432:5432" \
+		-e POSTGRES_USER=${POSTGRES_USER} \
+		-e POSTGRES_PASSWORD=${POSTGRES_PASSWORD} \
+		-e POSTGRES_DB=${POSTGRES_DB} \
+		-d postgres:12-alpine || echo "Container may already be running."
+
+.PHONY: createdb
+createdb:
+	@echo "Creating database ${POSTGRES_DB}..."
+	@docker exec -it simple-bank-pgdb createdb --username=${POSTGRES_USER} --owner=${POSTGRES_USER} ${POSTGRES_DB} || echo "Database creation failed or already exists."
+
+.PHONY: dropdb
+dropdb:
+	@echo "Dropping database ${POSTGRES_DB}..."
+	@docker exec -it simple-bank-pgdb dropdb ${POSTGRES_DB} || echo "Database does not exist or failed to drop."
+
+.PHONY: migrate-up
+migrate-up:
+	@echo "Running migrations up..."
+	@migrate -path db/migration -database "$(POSTGRES_CONNECTION_URL)" -verbose up || echo "Migration failed."
+
+.PHONY: migrate-down
+migrate-down:
+	@echo "Running migrations down..."
+	@migrate -path db/migration -database "$(POSTGRES_CONNECTION_URL)" -verbose down || echo "Migration rollback failed."
+
+.PHONY: sqlc
+sqlc:
+	@echo "Generating SQL code..."
+	@sqlc generate || echo "SQL code generation failed."
+
+.PHONY: test
+test:
+	@echo "Running tests with coverage..."
+	@go test -v -cover ./...
+
+.PHONY: stop-postgres
+stop-postgres:
+	@echo "Stopping PostgreSQL container..."
+	@docker stop simple-bank-pgdb || echo "Container is not running."
+
+.PHONY: remove-postgres
+remove-postgres: stop-postgres
+	@echo "Removing PostgreSQL container..."
+	@docker rm simple-bank-pgdb || echo "Container does not exist."
+
+.PHONY: resetdb
+resetdb: dropdb createdb
+	@echo "Database reset complete."
+
+--
