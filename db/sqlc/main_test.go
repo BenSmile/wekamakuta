@@ -24,7 +24,7 @@ func TestMain(m *testing.M) {
 
 	testDB, err = sql.Open(config.DBDriver, config.DBSource)
 	if err != nil {
-		log.Fatal("we cannot connect to the db", err)
+		log.Fatal("we cannot connect to the db:", err)
 	}
 
 	testQueries = New(testDB)
