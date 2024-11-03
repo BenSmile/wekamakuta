@@ -120,3 +120,21 @@ resetdb: dropdb createdb
 	@echo "Database reset complete."
 
 --
+
+
+ACID : Atomicity | Consistency | Isolation | Durability
+
+Transcation Isolation Level
+
+In PostgreSQL:
+
+V -> not solve
+X -> solve
+
+Issue \ TIL               Read Uncommitted          Read Committed          Repeatable Read          Serializable
+Dirty Read                        X                        X                        X                        X
+Not-Repeatable Read               V                        V                        X                        X
+Phantom Read                      V                        V                        X                        X
+Serialization Anomaly             V                        V                        V                        X
+
+
