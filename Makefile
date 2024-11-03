@@ -35,3 +35,7 @@ test:
 .PHONY: dburl
 dburl:
 	@echo "Database URL: ${DB_URL}"
+
+.PHONY: server
+server:
+	@go run main.go
