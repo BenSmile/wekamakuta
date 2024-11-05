@@ -39,3 +39,7 @@ dburl:
 .PHONY: server
 server:
 	@go run main.go
+
+.PHONY: mock
+mock:
+	@mockgen -package mockdb -destination db/mock/store.go github.com/bensmile/wekamakuta/db/sqlc Store
