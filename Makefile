@@ -20,9 +20,17 @@ dropdb:
 migrate-up:
 	@migrate -path db/migration -database "${DB_URL}" -verbose up
 
+.PHONY: migrate-up1
+migrate-up1:
+	@migrate -path db/migration -database "${DB_URL}" -verbose up 1
+
 .PHONY: migrate-down
 migrate-down:
 	@migrate -path db/migration -database "${DB_URL}" -verbose down
+
+.PHONY: migrate-down1
+migrate-down1:
+	@migrate -path db/migration -database "${DB_URL}" -verbose down 1
 
 .PHONY: sqlc
 sqlc:
