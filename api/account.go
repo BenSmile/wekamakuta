@@ -6,6 +6,7 @@ import (
 	"net/http"
 
 	db "github.com/bensmile/wekamakuta/db/sqlc"
+	"github.com/bensmile/wekamakuta/token"
 	"github.com/gin-gonic/gin"
 	"github.com/lib/pq"
 )
@@ -23,9 +24,10 @@ func (s *Server) createAccount(ctx *gin.Context) {
 		ctx.JSON(http.StatusBadRequest, errorResponse(err))
 		return
 	}
+	authPayload := ctx.MustGet(authorizationTokenKey).(*token.Payload)
 
 	args := db.CreateAccountParams{
-		Owner:    req.Owner,
+		Owner:    authPayload.Username,
 		Currency: req.Currency,
 		Balance:  0,
 	}
@@ -71,6 +73,14 @@ func (s *Server) getAccount(ctx *gin.Context) {
 		return
 	}
 
+	authPayload := ctx.MustGet(authorizationTokenKey).(*token.Payload)
+
+	if account.Owner != authPayload.Username {
+		err := errors.New("account doesn't belong to the authenticated user")
+		ctx.JSON(http.StatusUnauthorized, errorResponse(err))
+		return
+	}
+
 	ctx.JSON(http.StatusOK, account)
 
 }
@@ -86,8 +96,9 @@ func (s *Server) listAccounts(ctx *gin.Context) {
 		ctx.JSON(http.StatusBadRequest, errorResponse(err))
 		return
 	}
-
+	authPayload := ctx.MustGet(authorizationTokenKey).(*token.Payload)
 	args := db.ListAccountsParams{
+		Owner:  authPayload.Username,
 		Limit:  req.PageSize,
 		Offset: (req.PageId - 1) * req.PageSize,
 	}
