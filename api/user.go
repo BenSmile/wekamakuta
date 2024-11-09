@@ -19,7 +19,7 @@ type createUserRequest struct {
 	Email    string `json:"email" binding:"required,email"`
 }
 
-type createUserResponse struct {
+type userResponse struct {
 	Username          string    `json:"username"`
 	FullName          string    `json:"full_name"`
 	Email             string    `json:"email"`
@@ -64,7 +64,13 @@ func (s *Server) createUser(ctx *gin.Context) {
 		return
 	}
 
-	rsp := createUserResponse{
+	rsp := newUserResponse(user)
+
+	ctx.JSON(http.StatusCreated, rsp)
+}
+
+func newUserResponse(user db.User) userResponse {
+	rsp := userResponse{
 		Username:          user.Username,
 		FullName:          user.FullName,
 		Email:             user.Email,
@@ -72,23 +78,29 @@ func (s *Server) createUser(ctx *gin.Context) {
 		PasswordChangedAt: user.PasswordChangedAt,
 	}
 
-	ctx.JSON(http.StatusCreated, rsp)
+	return rsp
 }
 
-type getUserRequest struct {
-	ID int64 `uri:"id"  binding:"required,min=1"`
+type loginUserRequest struct {
+	Username string `json:"username" binding:"required"`
+	Password string `json:"password" binding:"required,min=6"`
 }
 
-func (s *Server) getUser(ctx *gin.Context) {
+type loginUserResponse struct {
+	AccessToken string       `json:"access_token"`
+	User        userResponse `json:"user"`
+}
 
-	var req getAccountRequest
+func (s *Server) loginUser(ctx *gin.Context) {
 
-	if err := ctx.ShouldBindUri(&req); err != nil {
+	var req loginUserRequest
+
+	if err := ctx.ShouldBindJSON(&req); err != nil {
 		ctx.JSON(http.StatusBadRequest, errorResponse(err))
 		return
 	}
 
-	account, err := s.store.GetAccount(ctx, req.ID)
+	user, err := s.store.GetUser(ctx, req.Username)
 
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
@@ -99,6 +111,21 @@ func (s *Server) getUser(ctx *gin.Context) {
 		return
 	}
 
-	ctx.JSON(http.StatusOK, account)
+	if err := util.CheckPassword(req.Password, user.HashedPassword); err != nil {
+		ctx.JSON(http.StatusUnauthorized, errorResponse(err))
+		return
+	}
+
+	accessToken, err := s.tokenMaker.CreateToken(user.Username, s.config.AccessTokenDuration)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+		return
+	}
+
+	rsp := loginUserResponse{
+		AccessToken: accessToken,
+		User:        newUserResponse(user),
+	}
+	ctx.JSON(http.StatusOK, rsp)
 
 }
