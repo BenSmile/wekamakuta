@@ -182,7 +182,7 @@ func TestCreateUserApi(t *testing.T) {
 			// build stubs
 			tc.buildStubs(store)
 			// start test server and send request
-			server := NewServer(store)
+			server := newTestServer(t, store)
 			recorder := httptest.NewRecorder()
 			url := "/users"
 			// Marsha body data to JSON
