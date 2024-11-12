@@ -6,7 +6,7 @@ POSTGRES_PASSWORD := secret
 POSTGRES_DB := simple_bank
 .PHONY: postgres
 postgres:
-	@docker run --name simple-bank-pgdb -p 5432:5432 -e POSTGRES_USER=${POSTGRES_USER} -e POSTGRES_PASSWORD=${POSTGRES_PASSWORD} -d postgres:12-alpine
+	@docker run --network bank-network --name simple-bank-pgdb -p 5432:5432 -e POSTGRES_USER=${POSTGRES_USER} -e POSTGRES_PASSWORD=${POSTGRES_PASSWORD} -d postgres:12-alpine
 
 .PHONY: createdb
 createdb:
