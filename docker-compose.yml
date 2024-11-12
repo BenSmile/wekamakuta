@@ -1,17 +1,21 @@
 version: "3.8"
 services:
-  db:
-    image: postgres:latest
-    container_name: simple-bank-pgdb
+  postgres:
+    image: postgres:12-alpine
     environment:
-      POSTGRES_USER: ${POSTGRES_USER}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-      POSTGRES_DB: ${POSTGRES_DB}
-    ports:
-      - "5432:5432"
-    networks:
-      - postgres-network
+      POSTGRES_USER: root
+      POSTGRES_PASSWORD: secret
+      POSTGRES_DB: simple_bank
 
-networks:
-  postgres-network:
-    driver: bridge
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - 8080:8080
+    depends_on:
+      - postgres
+    environment:
+      - DB_SOURCE=postgres://root:secret@postgres:5432/simple_bank?sslmode=disable
+    entrypoint: ["/app/wait-for.sh", "postgres:5432", "--", "/app/start.sh"]
+    command: ["/app/main"]
