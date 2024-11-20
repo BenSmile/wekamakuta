@@ -6,7 +6,8 @@ POSTGRES_PASSWORD := secret
 POSTGRES_DB := simple_bank
 .PHONY: postgres
 postgres:
-	@docker run --network bank-network --name simple-bank-pgdb -p 5432:5432 -e POSTGRES_USER=${POSTGRES_USER} -e POSTGRES_PASSWORD=${POSTGRES_PASSWORD} -d postgres:12-alpine
+	@docker run --name simple-bank-pgdb -p 5432:5432 -e POSTGRES_USER=${POSTGRES_USER} -e POSTGRES_PASSWORD=${POSTGRES_PASSWORD} -d postgres:12-alpine
+	# @docker run --network bank-network --name simple-bank-pgdb -p 5432:5432 -e POSTGRES_USER=${POSTGRES_USER} -e POSTGRES_PASSWORD=${POSTGRES_PASSWORD} -d postgres:12-alpine
 
 .PHONY: createdb
 createdb:
@@ -51,3 +52,11 @@ server:
 .PHONY: mock
 mock:
 	@mockgen -package mockdb -destination db/mock/store.go github.com/bensmile/wekamakuta/db/sqlc Store
+
+.PHONY: db_docs
+db_docs:
+	@dbdocs build doc/db.dbml
+
+.PHONY: db_schema
+db_schema:
+	@dbml2sql --postgres -o doc/schema.sql doc/db.dbml
