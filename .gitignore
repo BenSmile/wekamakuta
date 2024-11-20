@@ -1,3 +1,5 @@
 .env
 
 .github/workflows/deploy.yml
+
+*.log

@@ -152,3 +152,20 @@ Serialization Anomaly             V                        V                    
 create new migration
 
 migrate create -ext sql -dir db/migration -seq add_users
+
+-> dbdocs
+
+https://docs.dbdocs.io/
+
+https://dbdocs.io/benjkafirongo/simple_bank
+
+dbdocs build doc/db.dbml
+
+dbdocs password --set <password> --project <project_name> 
+
+-> dbml
+
+npm install -g @dbml/cli
+
+dbml2sql --postgres -o doc/schema.sql doc/db.dbml
+
