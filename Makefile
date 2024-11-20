@@ -52,3 +52,11 @@ server:
 .PHONY: mock
 mock:
 	@mockgen -package mockdb -destination db/mock/store.go github.com/bensmile/wekamakuta/db/sqlc Store
+
+.PHONY: db_docs
+db_docs:
+	@dbdocs build doc/db.dbml
+
+.PHONY: db_schema
+db_schema:
+	@dbml2sql --postgres -o doc/schema.sql doc/db.dbml
