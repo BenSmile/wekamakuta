@@ -169,3 +169,10 @@ npm install -g @dbml/cli
 
 dbml2sql --postgres -o doc/schema.sql doc/db.dbml
 
+-> evans : grpc client
+
+https://github.com/ktr0731/evans
+
+-> grpc gateway
+
+https://github.com/grpc-ecosystem/grpc-gateway
