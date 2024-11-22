@@ -14,12 +14,8 @@
       "name": "SimpleBank"
     }
   ],
-  "consumes": [
-    "application/json"
-  ],
-  "produces": [
-    "application/json"
-  ],
+  "consumes": ["application/json"],
+  "produces": ["application/json"],
   "paths": {
     "/v1/create_user": {
       "post": {
@@ -50,9 +46,7 @@
             }
           }
         ],
-        "tags": [
-          "SimpleBank"
-        ]
+        "tags": ["SimpleBank"]
       }
     },
     "/v1/login_user": {
@@ -84,9 +78,7 @@
             }
           }
         ],
-        "tags": [
-          "SimpleBank"
-        ]
+        "tags": ["SimpleBank"]
       }
     }
   },
