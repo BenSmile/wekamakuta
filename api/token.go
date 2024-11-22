@@ -75,6 +75,11 @@ func (s *Server) renewAccessToken(ctx *gin.Context) {
 		s.config.RefreshTokenDuration,
 	)
 
+	if err != nil {
+		ctx.JSON(http.StatusUnauthorized, errorResponse(err))
+		return
+	}
+
 	rsp := renewAccessTokenResponse{
 		AccessToken:          refreshToken,
 		AccessTokenExpiresAt: refreshPayload.ExpiredAt,
