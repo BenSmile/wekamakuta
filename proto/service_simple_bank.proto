@@ -5,8 +5,21 @@ package pb;
 import "rpc_create_user.proto";
 import "rpc_login_user.proto";
 import "google/api/annotations.proto";
+import "protoc-gen-openapiv2/options/annotations.proto";
 
 option go_package = "github.com/bensmile/wekamakuta/pb";
+
+option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
+  info : {
+    title : "Wekamakuta"
+    version : "1.0"
+    contact : {
+      name : "bkafirongo"
+      url : "https://github.com/bensmile/wekamakuta"
+      email : "bkafirongo@gmail.com"
+    }
+  }
+};
 
 service SimpleBank {
   rpc CreateUser(CreateUserRequest) returns (CreateUserResponse) {
