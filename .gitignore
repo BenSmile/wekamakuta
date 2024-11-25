@@ -3,3 +3,6 @@
 .github/workflows/deploy.yml
 
 *.log
+
+.DS_Store
+
