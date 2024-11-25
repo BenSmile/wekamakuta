@@ -7,7 +7,7 @@ import (
 	"time"
 
 	db "github.com/bensmile/wekamakuta/db/sqlc"
-	"github.com/bensmile/wekamakuta/db/util"
+	"github.com/bensmile/wekamakuta/util"
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 	"github.com/lib/pq"

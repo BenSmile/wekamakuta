@@ -4,8 +4,8 @@ import (
 	"fmt"
 
 	db "github.com/bensmile/wekamakuta/db/sqlc"
-	"github.com/bensmile/wekamakuta/db/util"
 	"github.com/bensmile/wekamakuta/token"
+	"github.com/bensmile/wekamakuta/util"
 	"github.com/gin-gonic/gin"
 	"github.com/gin-gonic/gin/binding"
 	"github.com/go-playground/validator/v10"
