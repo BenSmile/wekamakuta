@@ -9,10 +9,10 @@ import (
 
 	"github.com/bensmile/wekamakuta/api"
 	db "github.com/bensmile/wekamakuta/db/sqlc"
-	"github.com/bensmile/wekamakuta/db/util"
 	_ "github.com/bensmile/wekamakuta/doc/statik"
 	"github.com/bensmile/wekamakuta/gapi"
 	"github.com/bensmile/wekamakuta/pb"
+	"github.com/bensmile/wekamakuta/util"
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
 	_ "github.com/lib/pq"
 	"github.com/rakyll/statik/fs"
@@ -37,6 +37,7 @@ func main() {
 	store := db.NewStore(conn)
 	go runGatewayServer(config, store)
 	runGrpcServer(config, store)
+	// runGinServer(config, store)
 
 }
 

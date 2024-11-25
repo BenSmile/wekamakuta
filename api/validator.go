@@ -1,7 +1,7 @@
 package api
 
 import (
-	"github.com/bensmile/wekamakuta/db/util"
+	"github.com/bensmile/wekamakuta/util"
 	"github.com/go-playground/validator/v10"
 )
 

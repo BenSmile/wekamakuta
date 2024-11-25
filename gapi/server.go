@@ -4,9 +4,9 @@ import (
 	"fmt"
 
 	db "github.com/bensmile/wekamakuta/db/sqlc"
-	"github.com/bensmile/wekamakuta/db/util"
 	"github.com/bensmile/wekamakuta/pb"
 	"github.com/bensmile/wekamakuta/token"
+	"github.com/bensmile/wekamakuta/util"
 )
 
 // Server serves gRPC requests for our banking service
