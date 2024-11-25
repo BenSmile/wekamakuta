@@ -13,7 +13,7 @@ import (
 
 	mockdb "github.com/bensmile/wekamakuta/db/mock"
 	db "github.com/bensmile/wekamakuta/db/sqlc"
-	"github.com/bensmile/wekamakuta/db/util"
+	"github.com/bensmile/wekamakuta/util"
 	"github.com/gin-gonic/gin"
 	"github.com/golang/mock/gomock"
 	"github.com/lib/pq"
