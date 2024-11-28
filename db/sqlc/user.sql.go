@@ -7,6 +7,7 @@ package db
 
 import (
 	"context"
+	"database/sql"
 )
 
 const createUser = `-- name: CreateUser :one
@@ -50,6 +51,91 @@ LIMIT 1
 
 func (q *Queries) GetUser(ctx context.Context, username string) (User, error) {
 	row := q.db.QueryRowContext(ctx, getUser, username)
+	var i User
+	err := row.Scan(
+		&i.Username,
+		&i.HashedPassword,
+		&i.FullName,
+		&i.Email,
+		&i.PasswordChangedAt,
+		&i.CreatedAt,
+	)
+	return i, err
+}
+
+const updateUser = `-- name: UpdateUser :one
+UPDATE users
+SET hashed_password = coalesce($1, hashed_password),
+    full_name = coalesce($2, full_name),
+    email = coalesce($3, email)
+WHERE username = $4
+RETURNING username, hashed_password, full_name, email, password_changed_at, created_at
+`
+
+type UpdateUserParams struct {
+	HashedPassword sql.NullString `json:"hashed_password"`
+	FullName       sql.NullString `json:"full_name"`
+	Email          sql.NullString `json:"email"`
+	Username       string         `json:"username"`
+}
+
+func (q *Queries) UpdateUser(ctx context.Context, arg UpdateUserParams) (User, error) {
+	row := q.db.QueryRowContext(ctx, updateUser,
+		arg.HashedPassword,
+		arg.FullName,
+		arg.Email,
+		arg.Username,
+	)
+	var i User
+	err := row.Scan(
+		&i.Username,
+		&i.HashedPassword,
+		&i.FullName,
+		&i.Email,
+		&i.PasswordChangedAt,
+		&i.CreatedAt,
+	)
+	return i, err
+}
+
+const updateUser2 = `-- name: UpdateUser2 :one
+UPDATE users
+SET hashed_password = CASE
+        WHEN $1::boolean = TRUE THEN $2
+        ELSE hashed_password
+    END,
+    full_name = CASE
+        WHEN $3::boolean = TRUE THEN $4
+        ELSE full_name
+    END,
+    email = CASE
+        WHEN $5::boolean = TRUE THEN $6
+        ELSE email
+    END
+WHERE username = $7
+RETURNING username, hashed_password, full_name, email, password_changed_at, created_at
+`
+
+type UpdateUser2Params struct {
+	SetHashedPassword bool   `json:"set_hashed_password"`
+	HashedPassword    string `json:"hashed_password"`
+	SetFullName       bool   `json:"set_full_name"`
+	FullName          string `json:"full_name"`
+	SetEmail          bool   `json:"set_email"`
+	Email             string `json:"email"`
+	Username          string `json:"username"`
+}
+
+func (q *Queries) UpdateUser2(ctx context.Context, arg UpdateUser2Params) (User, error) {
+	row := q.db.QueryRowContext(ctx, updateUser2,
+		arg.SetHashedPassword,
+		arg.HashedPassword,
+		arg.SetFullName,
+		arg.FullName,
+		arg.SetEmail,
+		arg.Email,
+		arg.Username,
+	)
 	var i User
 	err := row.Scan(
 		&i.Username,

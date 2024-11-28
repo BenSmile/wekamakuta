@@ -130,7 +130,11 @@ resetdb: dropdb createdb
 	@echo "Database reset complete."
 
 --
+salu
+--management.endpoints.enabled-by-default=false
+-> viper
 
+https://github.com/spf13/viper
 
 ACID : Atomicity | Consistency | Isolation | Durability
 
@@ -176,6 +180,8 @@ https://github.com/ktr0731/evans
 -> grpc gateway
 
 https://github.com/grpc-ecosystem/grpc-gateway
+
+https://github.com/grpc-ecosystem/grpc-gateway/blob/main/examples/internal/proto/examplepb/a_bit_of_everything.proto
 
 
 -> statik content
