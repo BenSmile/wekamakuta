@@ -3,7 +3,11 @@ package main
 import (
 	"context"
 	"database/sql"
-	"log"
+	"os"
+
+	"github.com/rs/zerolog"
+	"github.com/rs/zerolog/log"
+
 	"net"
 	"net/http"
 
@@ -29,13 +33,17 @@ func main() {
 
 	config, err := util.LoadConfig(".")
 	if err != nil {
-		log.Fatal("cannot load config:", err)
+		log.Fatal().Msg("cannot load config:")
+	}
+
+	if config.Environment == "development" {
+		log.Logger = log.Output(zerolog.ConsoleWriter{Out: os.Stderr})
 	}
 
 	conn, err := sql.Open(config.DBDriver, config.DBSource)
 
 	if err != nil {
-		log.Fatal("cannot connect to db:", err)
+		log.Fatal().Msg("cannot connect to db:")
 	}
 
 	runDBMigration(config.MigrationURL, config.DBSource)
@@ -50,38 +58,39 @@ func main() {
 func runGinServer(config util.Config, store db.Store) {
 	server, err := api.NewServer(config, store)
 	if err != nil {
-		log.Fatal("cannot create server: %w", err)
+		log.Fatal().Msg("cannot create server: %w")
 	}
 
 	if err := server.Start(config.HttpServerAddress); err != nil {
-		log.Fatal("cannot start the server:", err)
+		log.Fatal().Msg("cannot start the server:")
 	}
 }
 
 func runGrpcServer(config util.Config, store db.Store) {
 	server, err := gapi.NewServer(config, store)
 	if err != nil {
-		log.Fatal("could not create grpc server", err)
+		log.Fatal().Msg("could not create grpc server")
 	}
-	grpcServer := grpc.NewServer()
+	grpcLogger := grpc.UnaryInterceptor(gapi.GrpcLogger)
+	grpcServer := grpc.NewServer(grpcLogger)
 	pb.RegisterSimpleBankServer(grpcServer, server)
 	reflection.Register(grpcServer)
 
 	listener, err := net.Listen("tcp", config.GrpcServerAddress)
 	if err != nil {
-		log.Fatal("cannot create listener")
+		log.Fatal().Msg("cannot create listener")
 	}
-	log.Printf("start gRPC server at %s", listener.Addr().String())
+	log.Info().Msgf("start gRPC server at %s", listener.Addr().String())
 
 	if err := grpcServer.Serve(listener); err != nil {
-		log.Fatal("cannot start grpc server :", err)
+		log.Fatal().Msg("cannot start grpc server :")
 	}
 }
 
 func runGatewayServer(config util.Config, store db.Store) {
 	server, err := gapi.NewServer(config, store)
 	if err != nil {
-		log.Fatal("could not create grpc server", err)
+		log.Fatal().Msg("could not create grpc server")
 	}
 	jsonOptions := runtime.WithMarshalerOption(runtime.MIMEWildcard, &runtime.JSONPb{
 		MarshalOptions: protojson.MarshalOptions{
@@ -95,7 +104,7 @@ func runGatewayServer(config util.Config, store db.Store) {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 	if err := pb.RegisterSimpleBankHandlerServer(ctx, grpcMux, server); err != nil {
-		log.Fatal("cannot register handler server")
+		log.Fatal().Msg("cannot register handler server")
 	}
 
 	mux := http.NewServeMux()
@@ -104,7 +113,7 @@ func runGatewayServer(config util.Config, store db.Store) {
 	statikFS, err := fs.New()
 
 	if err != nil {
-		log.Fatal("cannot create statik fs")
+		log.Fatal().Msg("cannot create statik fs")
 	}
 
 	swaggerHandler := http.StripPrefix("/swagger/", http.FileServer(statikFS))
@@ -113,24 +122,24 @@ func runGatewayServer(config util.Config, store db.Store) {
 
 	listener, err := net.Listen("tcp", config.HttpServerAddress)
 	if err != nil {
-		log.Fatal("cannot create listener")
+		log.Fatal().Msg("cannot create listener")
 	}
-	log.Printf("start gRPC server at %s", listener.Addr().String())
+	log.Info().Msgf("start gRPC server at %s", listener.Addr().String())
 
 	if err := http.Serve(listener, mux); err != nil {
-		log.Fatal("cannot start HTTP gateway server :", err)
+		log.Fatal().Msg("cannot start HTTP gateway server :")
 	}
 }
 
 func runDBMigration(migrationURL, dbSource string) {
 	migration, err := migrate.New(migrationURL, dbSource)
 	if err != nil {
-		log.Fatal("cannot create new migration instance:", err)
+		log.Fatal().Msg("cannot create new migration instance:")
 	}
 
 	if err = migration.Up(); err != nil && err != migrate.ErrNoChange {
-		log.Fatal("failed to run the migrate up:", err)
+		log.Fatal().Msg("failed to run the migrate up:")
 	}
 
-	log.Println("db migrated successfully")
+	log.Info().Msg("db migrated successfully")
 }

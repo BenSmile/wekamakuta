@@ -19,7 +19,6 @@ func (server *Server) authorizeUser(ctx context.Context) (*token.Payload, error)
 	if !ok {
 		return nil, fmt.Errorf("missing metadata")
 	}
-
 	values := md.Get(authorizationHeader)
 	if len(values) == 0 {
 		return nil, fmt.Errorf("missing Authorization Header")
@@ -33,7 +32,6 @@ func (server *Server) authorizeUser(ctx context.Context) (*token.Payload, error)
 	if authType != authorizationType {
 		return nil, fmt.Errorf("unsupported authorization type: %s", authType)
 	}
-
 	accessToken := fields[1]
 	payload, err := server.tokenMaker.VerifyToken(accessToken)
 	if err != nil {
