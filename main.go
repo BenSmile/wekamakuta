@@ -60,6 +60,7 @@ func runGinServer(config util.Config, store db.Store) {
 	if err != nil {
 		log.Fatal().Msg("cannot create server: %w")
 	}
+	log.Info().Msgf("start HTTP server at %s", config.HttpServerAddress)
 
 	if err := server.Start(config.HttpServerAddress); err != nil {
 		log.Fatal().Msg("cannot start the server:")
@@ -122,11 +123,11 @@ func runGatewayServer(config util.Config, store db.Store) {
 
 	listener, err := net.Listen("tcp", config.HttpServerAddress)
 	if err != nil {
-		log.Fatal().Msg("cannot create listener")
+		log.Fatal().Msgf("cannot create listener :%s", err.Error())
 	}
 	log.Info().Msgf("start gRPC server at %s", listener.Addr().String())
-
-	if err := http.Serve(listener, mux); err != nil {
+	handler := gapi.HttpLogger(mux)
+	if err := http.Serve(listener, handler); err != nil {
 		log.Fatal().Msg("cannot start HTTP gateway server :")
 	}
 }
