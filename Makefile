@@ -79,3 +79,7 @@ evans:
 .PHONY: redis
 redis:
 	docker run --name redis -p 6379:6379 redis:7-alpine
+
+.PHONY: new_migration
+new_migration:
+	migrate create -ext sql -dir db/migration -seq $(name)
