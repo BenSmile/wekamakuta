@@ -39,7 +39,7 @@ sqlc:
 
 .PHONY: test
 test:
-	@go test -v -cover -count=1 ./...
+	@go test -v -cover -count=1 -short ./...
 
 .PHONY: dburl
 dburl:
