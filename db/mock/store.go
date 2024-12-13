@@ -364,3 +364,33 @@ func (mr *MockStoreMockRecorder) UpdateUser2(arg0, arg1 interface{}) *gomock.Cal
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateUser2", reflect.TypeOf((*MockStore)(nil).UpdateUser2), arg0, arg1)
 }
+
+// UpdateVerifyEmail mocks base method.
+func (m *MockStore) UpdateVerifyEmail(arg0 context.Context, arg1 db.UpdateVerifyEmailParams) (db.VerifyEmail, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "UpdateVerifyEmail", arg0, arg1)
+	ret0, _ := ret[0].(db.VerifyEmail)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// UpdateVerifyEmail indicates an expected call of UpdateVerifyEmail.
+func (mr *MockStoreMockRecorder) UpdateVerifyEmail(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateVerifyEmail", reflect.TypeOf((*MockStore)(nil).UpdateVerifyEmail), arg0, arg1)
+}
+
+// VeirfyEmailTx mocks base method.
+func (m *MockStore) VeirfyEmailTx(arg0 context.Context, arg1 db.VeirfyEmailTxParams) (db.VeirfyEmailTxResult, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "VeirfyEmailTx", arg0, arg1)
+	ret0, _ := ret[0].(db.VeirfyEmailTxResult)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// VeirfyEmailTx indicates an expected call of VeirfyEmailTx.
+func (mr *MockStoreMockRecorder) VeirfyEmailTx(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "VeirfyEmailTx", reflect.TypeOf((*MockStore)(nil).VeirfyEmailTx), arg0, arg1)
+}

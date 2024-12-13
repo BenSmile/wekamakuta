@@ -22,6 +22,7 @@ Table verify_emails{
   secret_code varchar [not null]
   is_used boolean [not null, default: false]
   created_at timestamptz [not null, default: 'now()']
+  expired_at timestamptz [not null, default: `now() + interval '15 minutes'`]
 }
 
 Table account as A {

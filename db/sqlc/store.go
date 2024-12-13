@@ -17,6 +17,7 @@ type Store interface {
 	Querier
 	TransferTx(ctx context.Context, args TransferTxParams) (TransferTxResult, error)
 	CreateUserTx(ctx context.Context, args CreateUserTxParams) (CreateUserTxResult, error)
+	VeirfyEmailTx(ctx context.Context, args VeirfyEmailTxParams) (VeirfyEmailTxResult, error)
 }
 
 type SQLStore struct {
