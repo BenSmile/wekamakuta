@@ -192,3 +192,12 @@ https://github.com/rakyll/statik
 -> swagger ui
 
 https://github.com/swagger-api/swagger-ui
+
+
+-> logs 
+https://github.com/rs/zerolog
+
+-> async task with redis
+
+https://github.com/hibiken/asynq
+
