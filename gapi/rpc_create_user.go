@@ -41,7 +41,7 @@ func (server *Server) CreateUser(ctx context.Context, req *pb.CreateUserRequest)
 				// TODO: use db transaction
 				opts := []asynq.Option{
 					asynq.MaxRetry(10),
-					asynq.ProcessIn(5 * time.Second),
+					asynq.ProcessIn(10 * time.Second),
 					asynq.Queue(worker.QUEUE_CRITICAL),
 				}
 				return server.taskDistributor.DistributeTaskSendVerifyEmail(ctx, worker.PayloadSendVerifyEmail{

@@ -5,6 +5,7 @@ import (
 
 	db "github.com/bensmile/wekamakuta/db/sqlc"
 	"github.com/hibiken/asynq"
+	"github.com/rs/zerolog/log"
 )
 
 type TaskProcessor interface {
@@ -29,6 +30,13 @@ func NewRedisTaskProcessor(redisOpt asynq.RedisClientOpt, store db.Store) TaskPr
 			QUEUE_CRITICAL: 10,
 			QUEUE_DEFAULT:  5,
 		},
+		ErrorHandler: asynq.ErrorHandlerFunc(func(ctx context.Context, task *asynq.Task, err error) {
+			log.Error().Err(err).
+				Str("type", task.Type()).
+				Bytes("payload", task.Payload()).
+				Msg("process task failed")
+		}),
+		Logger: NewLogger(),
 	})
 
 	return &RedisTaskProcessor{
