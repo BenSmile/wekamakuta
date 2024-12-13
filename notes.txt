@@ -204,3 +204,9 @@ to ping redis docker exec -it redis redis-cli ping
 
 https://github.com/hibiken/asynq
 
+
+-> email
+
+https://github.com/jordan-wright/email
+
+
