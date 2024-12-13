@@ -28,14 +28,27 @@ func (server *Server) CreateUser(ctx context.Context, req *pb.CreateUserRequest)
 		return nil, status.Errorf(codes.Internal, "failed to hash password %s", err)
 	}
 
-	args := db.CreateUserParams{
-		Username:       req.GetUsername(),
-		Email:          req.GetEmail(),
-		HashedPassword: hashedPassword,
-		FullName:       req.GetFullName(),
-	}
-
-	user, err := server.store.CreateUser(ctx, args)
+	txResult, err := server.store.CreateUserTx(ctx,
+		db.CreateUserTxParams{
+			CreateUserParams: db.CreateUserParams{
+				Username:       req.GetUsername(),
+				Email:          req.GetEmail(),
+				HashedPassword: hashedPassword,
+				FullName:       req.GetFullName(),
+			},
+			AfterCreate: func(user db.User) error {
+				// send verification email
+				// TODO: use db transaction
+				opts := []asynq.Option{
+					asynq.MaxRetry(10),
+					asynq.ProcessIn(5 * time.Second),
+					asynq.Queue(worker.QUEUE_CRITICAL),
+				}
+				return server.taskDistributor.DistributeTaskSendVerifyEmail(ctx, worker.PayloadSendVerifyEmail{
+					Username: user.Username,
+				}, opts...)
+			},
+		})
 
 	if err != nil {
 		if pqErr, ok := err.(*pq.Error); ok {
@@ -47,21 +60,8 @@ func (server *Server) CreateUser(ctx context.Context, req *pb.CreateUserRequest)
 		return nil, status.Errorf(codes.Internal, "failed to create user %s", err)
 	}
 
-	// send verification email
-	// TODO: use db transaction
-	opts := []asynq.Option{
-		asynq.MaxRetry(10),
-		asynq.ProcessIn(5 * time.Second),
-		asynq.Queue(worker.QUEUE_CRITICAL),
-	}
-	if err = server.taskDistributor.DistributeTaskSendVerifyEmail(ctx, worker.PayloadSendVerifyEmail{
-		Username: user.Username,
-	}, opts...); err != nil {
-		return nil, status.Errorf(codes.Internal, "failed to distribute task to send verify email: %s", err.Error())
-	}
-
 	rsp := &pb.CreateUserResponse{
-		User: convertUser(user),
+		User: convertUser(txResult.User),
 	}
 
 	return rsp, nil
