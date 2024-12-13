@@ -12,6 +12,11 @@ type TaskProcessor interface {
 	ProcessTaskSendVerifyEmail(context.Context, *asynq.Task) error
 }
 
+const (
+	QUEUE_CRITICAL = "critical"
+	QUEUE_DEFAULT  = "default"
+)
+
 type RedisTaskProcessor struct {
 	server *asynq.Server
 	store  db.Store
@@ -19,7 +24,12 @@ type RedisTaskProcessor struct {
 
 func NewRedisTaskProcessor(redisOpt asynq.RedisClientOpt, store db.Store) TaskProcessor {
 
-	server := asynq.NewServer(redisOpt, asynq.Config{})
+	server := asynq.NewServer(redisOpt, asynq.Config{
+		Queues: map[string]int{
+			QUEUE_CRITICAL: 10,
+			QUEUE_DEFAULT:  5,
+		},
+	})
 
 	return &RedisTaskProcessor{
 		server: server,
