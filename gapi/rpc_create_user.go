@@ -37,8 +37,6 @@ func (server *Server) CreateUser(ctx context.Context, req *pb.CreateUserRequest)
 				FullName:       req.GetFullName(),
 			},
 			AfterCreate: func(user db.User) error {
-				// send verification email
-				// TODO: use db transaction
 				opts := []asynq.Option{
 					asynq.MaxRetry(10),
 					asynq.ProcessIn(10 * time.Second),

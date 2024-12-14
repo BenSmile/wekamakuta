@@ -52,6 +52,7 @@ server:
 .PHONY: mock
 mock:
 	@mockgen -package mockdb -destination db/mock/store.go github.com/bensmile/wekamakuta/db/sqlc Store
+	@mockgen -package mockwk -destination worker/mock/distributor.go github.com/bensmile/wekamakuta/worker TaskDistributor
 
 .PHONY: db_docs
 db_docs:
