@@ -18,7 +18,7 @@ func TestCreateTransfer(t *testing.T) {
 		Amount:        0,
 	}
 
-	transfer, err := testQueries.CreateTransfer(context.Background(), args)
+	transfer, err := testStore.CreateTransfer(context.Background(), args)
 
 	require.NoError(t, err)
 

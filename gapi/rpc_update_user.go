@@ -2,13 +2,13 @@ package gapi
 
 import (
 	"context"
-	"database/sql"
 	"time"
 
 	db "github.com/bensmile/wekamakuta/db/sqlc"
 	"github.com/bensmile/wekamakuta/pb"
 	"github.com/bensmile/wekamakuta/util"
 	"github.com/bensmile/wekamakuta/val"
+	"github.com/jackc/pgx/v5/pgtype"
 	"google.golang.org/genproto/googleapis/rpc/errdetails"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -31,12 +31,12 @@ func (server *Server) UpdateUser(ctx context.Context, req *pb.UpdateUserRequest)
 
 	args := db.UpdateUserParams{
 		Username: req.GetUsername(),
-		Email: sql.NullString{
+		Email: pgtype.Text{
 			String: req.GetEmail(),
 			Valid:  req.Email != nil,
 		},
 
-		FullName: sql.NullString{
+		FullName: pgtype.Text{
 			String: req.GetFullName(),
 			Valid:  req.FullName != nil,
 		},
@@ -47,11 +47,11 @@ func (server *Server) UpdateUser(ctx context.Context, req *pb.UpdateUserRequest)
 		if err != nil {
 			return nil, status.Errorf(codes.Internal, "failed to hash password %s", err)
 		}
-		args.HashedPassword = sql.NullString{
+		args.HashedPassword = pgtype.Text{
 			Valid:  true,
 			String: hashedPassword,
 		}
-		args.PasswordChangedAt = sql.NullTime{
+		args.PasswordChangedAt = pgtype.Timestamptz{
 			Valid: true,
 			Time:  time.Now(),
 		}
@@ -60,7 +60,7 @@ func (server *Server) UpdateUser(ctx context.Context, req *pb.UpdateUserRequest)
 	user, err := server.store.UpdateUser(ctx, args)
 
 	if err != nil {
-		if err == sql.ErrNoRows {
+		if err == db.ErrRecordNotFound {
 			return nil, status.Error(codes.NotFound, "user not found")
 		}
 		return nil, status.Errorf(codes.Internal, "failed to update user %s", err)
