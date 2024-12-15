@@ -16,7 +16,6 @@ import (
 	"github.com/bensmile/wekamakuta/util"
 	"github.com/gin-gonic/gin"
 	"github.com/golang/mock/gomock"
-	"github.com/lib/pq"
 	"github.com/stretchr/testify/require"
 )
 
@@ -118,7 +117,7 @@ func TestCreateUserApi(t *testing.T) {
 				store.EXPECT().
 					CreateUser(gomock.Any(), gomock.Any()).
 					Times(1).
-					Return(db.User{}, &pq.Error{Code: "23505"})
+					Return(db.User{}, db.ErrUniqueViolation)
 			},
 			checkResponse: func(t *testing.T, recorder *httptest.ResponseRecorder) {
 				require.Equal(t, http.StatusForbidden, recorder.Code)
@@ -185,7 +184,7 @@ func TestCreateUserApi(t *testing.T) {
 			server := newTestServer(t, store)
 			recorder := httptest.NewRecorder()
 			url := "/users"
-			// Marsha body data to JSON
+			// Marshal body data to JSON
 			data, err := json.Marshal(tc.body)
 			require.NoError(t, err)
 			req, err := http.NewRequest(http.MethodPost, url, bytes.NewReader(data))

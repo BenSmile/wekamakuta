@@ -8,7 +8,6 @@ import (
 
 	"github.com/bensmile/wekamakuta/util"
 	"github.com/jackc/pgx/v5/pgxpool"
-	_ "github.com/lib/pq"
 )
 
 var (
