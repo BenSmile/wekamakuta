@@ -41,18 +41,18 @@ func (server *Server) setupRouter() {
 	router := gin.Default()
 
 	{
-		router.POST("/v1/users", server.createUser)
-		router.POST("/v1/users/auth", server.loginUser)
+		router.POST("/api/v1/users", server.createUser)
+		router.POST("/api/v1/users/auth", server.loginUser)
 	}
 
-	router.POST("/v1/tokens/renew_access", server.renewAccessToken)
+	router.POST("/api/v1/tokens/renew_access", server.renewAccessToken)
 
 	authRoutes := router.Group("/").Use(authMiddleware(server.tokenMaker))
 	{
-		authRoutes.POST("/v1/accounts", server.createAccount)
-		authRoutes.GET("/v1/accounts/:id", server.getAccount)
-		authRoutes.GET("/v1/accounts", server.listAccounts)
-		authRoutes.POST("/v1/transfers", server.createTransfer)
+		authRoutes.POST("/api/v1/accounts", server.createAccount)
+		authRoutes.GET("/api/v1/accounts/:id", server.getAccount)
+		authRoutes.GET("/api/v1/accounts", server.listAccounts)
+		authRoutes.POST("/api/v1/transfers", server.createTransfer)
 	}
 
 	server.router = router
