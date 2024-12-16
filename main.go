@@ -62,8 +62,8 @@ func main() {
 	taskDistributor := worker.NewRedisTaskDistributor(redisOpt)
 
 	go runTaskProcessor(config, redisOpt, store)
-	// go runGatewayServer(config, store, taskDistributor)
-	go runGinServer(config, store)
+	go runGatewayServer(config, store, taskDistributor)
+	// go runGinServer(config, store)
 	runGrpcServer(config, store, taskDistributor)
 
 }
@@ -138,7 +138,7 @@ func runGatewayServer(config util.Config, store db.Store, taskDistributor worker
 	if err != nil {
 		log.Fatal().Msgf("cannot create listener :%s", err.Error())
 	}
-	log.Info().Msgf("start gRPC server at %s", listener.Addr().String())
+	log.Info().Msgf("start gRPC gateway at %s", listener.Addr().String())
 	handler := gapi.HttpLogger(mux)
 	if err := http.Serve(listener, handler); err != nil {
 		log.Fatal().Msg("cannot start HTTP gateway server :")

@@ -14,5 +14,6 @@ COPY --from=builder /app/wait-for.sh .
 RUN chmod +x /app/start.sh
 RUN chmod +x /app/wait-for.sh
 EXPOSE 8080
+EXPOSE 9090
 CMD [ "/app/main" ]
 ENTRYPOINT [ "/app/start.sh" ]
