@@ -2,7 +2,6 @@ package gapi
 
 import (
 	"context"
-	"fmt"
 	"time"
 
 	db "github.com/bensmile/wekamakuta/db/sqlc"
@@ -27,10 +26,6 @@ func (server *Server) CreateUser(ctx context.Context, req *pb.CreateUserRequest)
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, "failed to hash password %s", err)
 	}
-
-	fmt.Println(">> Creating user...")
-
-	time.Sleep(5 * time.Second)
 
 	txResult, err := server.store.CreateUserTx(ctx,
 		db.CreateUserTxParams{

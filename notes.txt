@@ -210,3 +210,11 @@ https://github.com/hibiken/asynq
 https://github.com/jordan-wright/email
 
 
+-> pgx
+
+https://github.com/jackc/pgx
+
+-> cors
+
+
+https://github.com/rs/cors

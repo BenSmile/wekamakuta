@@ -8,6 +8,7 @@ import (
 	"syscall"
 
 	"github.com/hibiken/asynq"
+	"github.com/rs/cors"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
 	"golang.org/x/sync/errgroup"
@@ -174,9 +175,25 @@ func runGatewayServer(waitGroup *errgroup.Group, ctx context.Context, config uti
 	swaggerHandler := http.StripPrefix("/swagger/", http.FileServer(statikFS))
 
 	mux.Handle("/swagger/", swaggerHandler)
+	c := cors.New(cors.Options{
+		AllowedOrigins: config.AllowedOrigins,
+		AllowedMethods: []string{
+			http.MethodGet,
+			http.MethodPost,
+			http.MethodPatch,
+			http.MethodDelete,
+			http.MethodPut,
+			http.MethodOptions,
+		},
+		AllowedHeaders: []string{
+			"Authorization",
+			"Content-Type"},
+		AllowCredentials: true,
+	})
 
+	handler := c.Handler(gapi.HttpLogger(mux))
 	httpServer := &http.Server{
-		Handler: gapi.HttpLogger(mux),
+		Handler: handler,
 		Addr:    config.HttpServerAddress,
 	}
 
