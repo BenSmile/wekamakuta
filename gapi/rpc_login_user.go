@@ -35,13 +35,14 @@ func (server *Server) LoginUser(ctx context.Context, req *pb.LoginRequest) (*pb.
 		return nil, status.Errorf(codes.PermissionDenied, "invalid password")
 	}
 
-	accessToken, accessPayload, err := server.tokenMaker.CreateToken(user.Username, server.config.AccessTokenDuration)
+	accessToken, accessPayload, err := server.tokenMaker.CreateToken(user.Username, user.Role, server.config.AccessTokenDuration)
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, "failed to create the token : %s", err)
 	}
 
 	refreshToken, refreshPayload, err := server.tokenMaker.CreateToken(
 		req.Username,
+		user.Role,
 		server.config.RefreshTokenDuration,
 	)
 

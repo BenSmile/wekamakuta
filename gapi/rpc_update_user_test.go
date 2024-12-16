@@ -15,7 +15,6 @@ import (
 	"github.com/jackc/pgx/v5/pgtype"
 	"github.com/stretchr/testify/require"
 	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/metadata"
 	"google.golang.org/grpc/status"
 )
 
@@ -66,15 +65,7 @@ func TestUpdateUserApi(t *testing.T) {
 					Return(updatedUser, nil)
 			},
 			buildContect: func(t *testing.T, tokenMaker token.Maker) context.Context {
-				accessToken, _, err := tokenMaker.CreateToken(user.Username, time.Minute)
-				require.NoError(t, err)
-				bearerToken := fmt.Sprintf("%s %s", authorizationType, accessToken)
-				md := metadata.MD{
-					authorizationHeader: []string{
-						bearerToken,
-					},
-				}
-				return metadata.NewIncomingContext(context.Background(), md)
+				return newContextWithBearerToken(t, tokenMaker, user.Username, user.Role, time.Minute)
 			},
 			checkResponse: func(t *testing.T, res *pb.UpdateUserResponse, err error) {
 				require.NoError(t, err)
@@ -99,7 +90,7 @@ func TestUpdateUserApi(t *testing.T) {
 					Return(db.User{}, db.ErrRecordNotFound)
 			},
 			buildContect: func(t *testing.T, tokenMaker token.Maker) context.Context {
-				return newContextWithBearerToken(t, tokenMaker, user.Username, time.Minute)
+				return newContextWithBearerToken(t, tokenMaker, user.Username, user.Role, time.Minute)
 			},
 			checkResponse: func(t *testing.T, res *pb.UpdateUserResponse, err error) {
 				require.Error(t, err)
@@ -121,7 +112,7 @@ func TestUpdateUserApi(t *testing.T) {
 					Times(0)
 			},
 			buildContect: func(t *testing.T, tokenMaker token.Maker) context.Context {
-				return newContextWithBearerToken(t, tokenMaker, user.Username, -time.Minute)
+				return newContextWithBearerToken(t, tokenMaker, user.Username, user.Role, -time.Minute)
 			},
 			checkResponse: func(t *testing.T, res *pb.UpdateUserResponse, err error) {
 				require.Error(t, err)
@@ -164,7 +155,7 @@ func TestUpdateUserApi(t *testing.T) {
 					Times(0)
 			},
 			buildContect: func(t *testing.T, tokenMaker token.Maker) context.Context {
-				return newContextWithBearerToken(t, tokenMaker, user.Username, time.Minute)
+				return newContextWithBearerToken(t, tokenMaker, user.Username, user.Role, time.Minute)
 			},
 			checkResponse: func(t *testing.T, res *pb.UpdateUserResponse, err error) {
 				require.Error(t, err)

@@ -14,7 +14,7 @@ import (
 const createUser = `-- name: CreateUser :one
 INSERT INTO users(username, hashed_password, full_name, email)
 VALUES ($1, $2, $3, $4)
-RETURNING username, hashed_password, full_name, email, password_changed_at, created_at, is_email_verified
+RETURNING username, hashed_password, full_name, email, password_changed_at, created_at, is_email_verified, role
 `
 
 type CreateUserParams struct {
@@ -40,12 +40,13 @@ func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) (User, e
 		&i.PasswordChangedAt,
 		&i.CreatedAt,
 		&i.IsEmailVerified,
+		&i.Role,
 	)
 	return i, err
 }
 
 const getUser = `-- name: GetUser :one
-SELECT username, hashed_password, full_name, email, password_changed_at, created_at, is_email_verified
+SELECT username, hashed_password, full_name, email, password_changed_at, created_at, is_email_verified, role
 FROM users
 WHERE username = $1
 LIMIT 1
@@ -62,6 +63,7 @@ func (q *Queries) GetUser(ctx context.Context, username string) (User, error) {
 		&i.PasswordChangedAt,
 		&i.CreatedAt,
 		&i.IsEmailVerified,
+		&i.Role,
 	)
 	return i, err
 }
@@ -80,7 +82,7 @@ SET hashed_password = coalesce($1, hashed_password),
         is_email_verified
     )
 WHERE username = $6
-RETURNING username, hashed_password, full_name, email, password_changed_at, created_at, is_email_verified
+RETURNING username, hashed_password, full_name, email, password_changed_at, created_at, is_email_verified, role
 `
 
 type UpdateUserParams struct {
@@ -110,6 +112,7 @@ func (q *Queries) UpdateUser(ctx context.Context, arg UpdateUserParams) (User, e
 		&i.PasswordChangedAt,
 		&i.CreatedAt,
 		&i.IsEmailVerified,
+		&i.Role,
 	)
 	return i, err
 }
@@ -129,7 +132,7 @@ SET hashed_password = CASE
         ELSE email
     END
 WHERE username = $7
-RETURNING username, hashed_password, full_name, email, password_changed_at, created_at, is_email_verified
+RETURNING username, hashed_password, full_name, email, password_changed_at, created_at, is_email_verified, role
 `
 
 type UpdateUser2Params struct {
@@ -161,6 +164,7 @@ func (q *Queries) UpdateUser2(ctx context.Context, arg UpdateUser2Params) (User,
 		&i.PasswordChangedAt,
 		&i.CreatedAt,
 		&i.IsEmailVerified,
+		&i.Role,
 	)
 	return i, err
 }

@@ -34,7 +34,7 @@ func TestGetAccountAPI(t *testing.T) {
 			name:      "OK",
 			accountID: account.ID,
 			setupAuth: func(t *testing.T, request *http.Request, tokenMaker token.Maker) {
-				addAuthorization(t, request, tokenMaker, "bearer", user.Username, time.Minute)
+				addAuthorization(t, request, tokenMaker, "bearer", user.Username, user.Role, time.Minute)
 			},
 			buildStubs: func(store *mockdb.MockStore) {
 				// build stubs
@@ -52,7 +52,7 @@ func TestGetAccountAPI(t *testing.T) {
 			name:      "Unauthorized",
 			accountID: account.ID,
 			setupAuth: func(t *testing.T, request *http.Request, tokenMaker token.Maker) {
-				addAuthorization(t, request, tokenMaker, "bearer", "user", time.Minute)
+				addAuthorization(t, request, tokenMaker, "bearer", "user", user.Role, time.Minute)
 			},
 			buildStubs: func(store *mockdb.MockStore) {
 				// build stubs
@@ -85,7 +85,7 @@ func TestGetAccountAPI(t *testing.T) {
 			name:      "NotFound",
 			accountID: account.ID,
 			setupAuth: func(t *testing.T, request *http.Request, tokenMaker token.Maker) {
-				addAuthorization(t, request, tokenMaker, "bearer", user.Username, time.Minute)
+				addAuthorization(t, request, tokenMaker, "bearer", user.Username, user.Role, time.Minute)
 			},
 			buildStubs: func(store *mockdb.MockStore) {
 				// build stubs
@@ -103,7 +103,7 @@ func TestGetAccountAPI(t *testing.T) {
 			name:      "InternalError",
 			accountID: account.ID,
 			setupAuth: func(t *testing.T, request *http.Request, tokenMaker token.Maker) {
-				addAuthorization(t, request, tokenMaker, "bearer", user.Username, time.Minute)
+				addAuthorization(t, request, tokenMaker, "bearer", user.Username, user.Role, time.Minute)
 			},
 			buildStubs: func(store *mockdb.MockStore) {
 				// build stubs
@@ -121,7 +121,7 @@ func TestGetAccountAPI(t *testing.T) {
 			name:      "InvalidId",
 			accountID: 0,
 			setupAuth: func(t *testing.T, request *http.Request, tokenMaker token.Maker) {
-				addAuthorization(t, request, tokenMaker, "bearer", user.Username, time.Minute)
+				addAuthorization(t, request, tokenMaker, "bearer", user.Username, user.Role, time.Minute)
 			},
 			buildStubs: func(store *mockdb.MockStore) {
 				// build stubs
